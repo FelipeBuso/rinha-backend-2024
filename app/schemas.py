@@ -1,25 +1,40 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
+from pydantic import BaseModel, TypeAdapter
+from typing import List
 
-from .database import Base
-
-
-class Client(Base):
-    __tablename__ = "clientes"
-
-    id = Column(Integer, primary_key=True)
-    limite = Column(Integer, default=0)
-    saldo = Column(Integer, default=0)
-
-    f_transacoes = relationship("Transaction", back_populates="cliente")
+from typing_extensions import TypedDict
 
 
-class Transaction(Base):
-    __tablename__ = "transacoes"
+class TransactioBase(BaseModel):
+    pass
 
-    id = Column(Integer, primary_key=True)
-    valor = Column(Integer, nullable=False)
-    tipo = Column(String, nullable=False)
-    client_id = Column(Integer, ForeignKey("clientes.id"))
 
-    cliente = relationship("Client", back_populates="f_transacoes")
+class CreateTransaction(TransactioBase):
+    valor: int
+    tipo: str
+    descricao: str
+
+
+class Transaction(TransactioBase):
+    linite: int
+    saldo: int
+
+    class Config:
+        orm_mode = True
+
+
+class Balance(TypedDict):
+    total: int
+    data_extrato: str
+    limite: int
+
+
+class LastTransactions(TypedDict):
+    valor: int
+    tipo: str
+    descricao: str
+    realizada_em: str
+
+
+class Client(BaseModel):
+    saldo: Balance
+    ultimas_transacoes: list[LastTransactions]
