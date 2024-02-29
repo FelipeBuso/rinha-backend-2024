@@ -1,5 +1,6 @@
-from pydantic import BaseModel, TypeAdapter
+from pydantic import BaseModel, Field
 from typing import List
+from datetime import datetime
 
 from typing_extensions import TypedDict
 
@@ -9,13 +10,15 @@ class TransactioBase(BaseModel):
 
 
 class CreateTransaction(TransactioBase):
-    valor: int
-    tipo: str
-    descricao: str
+    valor: int = Field(gt=0)
+    tipo: str = Field(
+        ..., description="O campo 'tipo' deve ser 'c' ou 'd'", pattern="^[cd]$"
+    )
+    descricao: str = Field(..., min_length=1, max_length=10)
 
 
 class Transaction(TransactioBase):
-    linite: int
+    limite: int
     saldo: int
 
     class Config:
@@ -24,7 +27,7 @@ class Transaction(TransactioBase):
 
 class Balance(TypedDict):
     total: int
-    data_extrato: str
+    data_extrato: datetime
     limite: int
 
 
@@ -32,7 +35,7 @@ class LastTransactions(TypedDict):
     valor: int
     tipo: str
     descricao: str
-    realizada_em: str
+    realizada_em: datetime
 
 
 class Client(BaseModel):

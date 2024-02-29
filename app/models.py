@@ -1,5 +1,6 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime
 from sqlalchemy.orm import relationship
+from datetime import datetime
 
 from .database import Base
 
@@ -22,5 +23,6 @@ class Transaction(Base):
     tipo = Column(String, nullable=False)
     descricao = Column(String, nullable=False)
     client_id = Column(Integer, ForeignKey("clientes.id"))
+    realizada_em = Column(DateTime, default=datetime.now())
 
     cliente = relationship("Client", back_populates="f_transacoes")
